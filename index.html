@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="BSF Memories" />
+<meta name="theme-color" content="#ffd6e8" />
+<title>Blacktown Special Force — Memories · Year 43</title>
+<!-- build: bsf-memorial-base -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%A8%3C/text%3E%3C/svg%3E" />
+<link rel="apple-touch-icon" href="icon.png" />
+<style>
+  :root{
+    --pink:#ffd6e8;
+    --pink-deep:#ff9ec7;
+    --pink-ink:#c2447a;
+    --blue:#cfe9ff;
+    --blue-deep:#9cd0ff;
+    --blue-ink:#3f7fb8;
+    --cream:#fff7fb;
+    --ink:#5a3350;
+    --ink-soft:#8a6b82;
+    --gold:#ffe1a8;
+    --radius-lg:28px;
+    --radius-md:18px;
+    --shadow:0 20px 45px -20px rgba(194,68,122,.35);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    min-height:100dvh;
+    font-family:"Quicksand","Avenir Next",-apple-system,BlinkMacSystemFont,sans-serif;
+    background:
+      radial-gradient(circle at 15% 8%, #ffe6f2 0%, transparent 45%),
+      radial-gradient(circle at 85% 12%, #dcefff 0%, transparent 45%),
+      radial-gradient(circle at 50% 100%, #ffeef7 0%, transparent 55%),
+      linear-gradient(160deg, var(--pink) 0%, var(--blue) 100%);
+    background-attachment:fixed;
+    color:var(--ink);
+    overflow-x:hidden;
+    position:relative;
+    -webkit-font-smoothing:antialiased;
+  }
+  @font-face{
+    font-family:"Quicksand";
+    src:local("Quicksand");
+  }
+
+  /* floating hearts background */
+  #heartField{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+  .float-heart{
+    position:absolute; bottom:-10%;
+    font-size:1.4rem; opacity:.35;
+    animation:floatUp linear infinite;
+    will-change:transform;
+    filter:drop-shadow(0 2px 6px rgba(255,158,199,.4));
+  }
+  @keyframes floatUp{
+    0%{ transform:translateY(0) translateX(0) rotate(0deg); opacity:0; }
+    10%{ opacity:.4; }
+    90%{ opacity:.3; }
+    100%{ transform:translateY(-120vh) translateX(var(--drift,20px)) rotate(25deg); opacity:0; }
+  }
+
+  main{
+    position:relative; z-index:1;
+    min-height:100dvh;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:max(28px,env(safe-area-inset-top)) 20px max(40px,env(safe-area-inset-bottom));
+    text-align:center;
+  }
+
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-size:.72rem; letter-spacing:.22em; text-transform:uppercase;
+    color:var(--pink-ink); font-weight:700;
+    background:rgba(255,255,255,.55);
+    padding:7px 16px; border-radius:999px;
+    border:1px solid rgba(255,158,199,.5);
+    backdrop-filter:blur(6px);
+    margin-bottom:18px;
+  }
+  .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--blue-ink);}
+
+  h1{
+    font-family:"Playfair Display","Georgia",serif;
+    font-weight:700; font-style:italic;
+    font-size:clamp(1.9rem, 7vw, 3.1rem);
+    line-height:1.15;
+    margin:0 0 8px;
+    background:linear-gradient(100deg, var(--pink-ink), var(--blue-ink) 70%);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  @font-face{font-family:"Playfair Display"; src:local("Playfair Display");}
+
+  .subline{
+    font-size:clamp(.92rem, 3.2vw, 1.05rem);
+    color:var(--ink-soft);
+    max-width:340px;
+    margin:0 0 34px;
+    line-height:1.55;
+  }
+  .subline b{color:var(--pink-ink); font-weight:700;}
+
+  .heart-divider{
+    display:flex; align-items:center; gap:10px;
+    margin:4px 0 26px; color:var(--pink-deep); opacity:.8;
+  }
+  .heart-divider svg{width:16px;height:16px;}
+  .heart-divider .line{width:44px; height:1px; background:linear-gradient(90deg, transparent, var(--pink-deep), transparent);}
+
+  .date-pill{
+    font-size:.82rem; color:var(--ink-soft);
+    background:rgba(255,255,255,.5); border:1px solid rgba(255,255,255,.7);
+    padding:8px 18px; border-radius:999px; backdrop-filter:blur(6px);
+  }
+  .date-pill b{color:var(--blue-ink);}
+
+  footer.tag{
+    position:relative; z-index:1;
+    padding:18px 20px max(18px,env(safe-area-inset-bottom));
+    text-align:center; font-size:.72rem; color:var(--ink-soft); opacity:.75;
+    letter-spacing:.04em;
+  }
+
+  /* carousel */
+  #carousel{
+    position:relative; width:100%; aspect-ratio:4/5;
+    max-height:min(380px, 38vh);
+    border-radius:22px; overflow:hidden;
+    background:linear-gradient(160deg, var(--pink), var(--blue));
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.6), 0 16px 36px -18px rgba(194,68,122,.5);
+    margin-bottom:12px;
+    touch-action:pan-y;
+  }
+  #carousel .slide{
+    position:absolute; inset:0;
+    display:flex; align-items:center; justify-content:center;
+    opacity:0; transition:opacity .6s ease;
+    pointer-events:none;
+  }
+  #carousel .slide.active{ opacity:1; pointer-events:auto; }
+  #carousel .slide img{
+    width:100%; height:100%; object-fit:cover; display:block;
+  }
+  #carousel .slide video{
+    width:100%; height:100%; object-fit:cover; display:block; background:#000;
+  }
+  /* native caption styling (works on browsers that render ::cue for <track>) */
+  #carousel .slide video::cue{
+    color:#ffe93b;
+    font-family:inherit; font-weight:800;
+    font-size:1.05em;
+    text-shadow:
+      -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000,
+      0 -2px 0 #000, 0 2px 0 #000, -2px 0 0 #000, 2px 0 0 #000;
+    background:transparent;
+  }
+  /* custom caption overlay (fallback for browsers with weak/no ::cue support, e.g. mobile Safari) */
+  .caption-overlay{
+    position:absolute; left:0; right:0; bottom:14%; z-index:2;
+    display:flex; justify-content:center; padding:0 12px;
+    pointer-events:none;
+  }
+  .caption-overlay span{
+    color:#ffe93b;
+    font-family:inherit; font-weight:800;
+    font-size:clamp(.85rem, 4vw, 1.05rem);
+    line-height:1.3; text-align:center;
+    text-shadow:
+      -2.5px -2.5px 0 #000, 2.5px -2.5px 0 #000, -2.5px 2.5px 0 #000, 2.5px 2.5px 0 #000,
+      0 -2.5px 0 #000, 0 2.5px 0 #000, -2.5px 0 0 #000, 2.5px 0 0 #000,
+      -1.5px -1.5px 0 #000, 1.5px -1.5px 0 #000, -1.5px 1.5px 0 #000, 1.5px 1.5px 0 #000;
+  }
+  .video-mute{
+    position:absolute; bottom:10px; right:10px; z-index:2;
+    width:34px; height:34px; border-radius:50%;
+    background:rgba(0,0,0,.45); color:#fff; border:none;
+    display:flex; align-items:center; justify-content:center;
+    font-size:15px; cursor:pointer; backdrop-filter:blur(4px);
+  }
+  #carousel .slide .placeholder{
+    display:flex; flex-direction:column; align-items:center; gap:10px;
+    color:var(--pink-ink); opacity:.55; padding:20px; text-align:center;
+    font-size:.85rem; font-weight:600;
+  }
+  #carousel .slide .placeholder svg{width:40px;height:40px;}
+  .dots{ display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:12px; }
+  .dots .track{ width:120px; height:4px; border-radius:999px; background:rgba(194,68,122,.18); overflow:hidden; }
+  .dots .fill{ height:100%; background:linear-gradient(90deg, var(--pink-deep), var(--blue-deep)); border-radius:999px; transition:width .4s ease; }
+  .dots .count{ font-size:.7rem; font-weight:700; color:var(--pink-ink); letter-spacing:.03em; font-variant-numeric:tabular-nums; min-width:38px; }
+
+  @media (prefers-reduced-motion: reduce){
+    .float-heart { animation:none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div id="heartField" aria-hidden="true"></div>
+
+<main>
+  <div class="eyebrow"><span class="dot"></span> Year 43 &middot; 2026</div>
+
+  <h1>Blacktown Special Force</h1>
+  <p class="subline">Memories from the program in Year 43 (2026).</p>
+
+  <div class="heart-divider">
+    <div class="line"></div>
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7.5-4.6-10.2-9.1C.2 9 1 5.5 4.1 4.2 6.6 3.1 9 4 12 7c3-3 5.4-3.9 7.9-2.8C23 5.5 23.8 9 22.2 11.9 19.5 16.4 12 21 12 21z"/></svg>
+    <div class="line"></div>
+  </div>
+
+    <div id="carousel">
+<div class="slide active" data-idx="0" data-kind="photo"><div class="placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg><span>Photos and videos from Year 43 are on their way.</span></div></div>
+<div class="slide" data-idx="1" data-kind="photo"><div class="placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg><span>Blacktown Special Force · Year 43 (2026)</span></div></div>
+<div class="slide" data-idx="2" data-kind="photo"><div class="placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg><span>Memories coming soon.</span></div></div>
+    </div>
+    <div class="dots" id="dots">
+      <div class="track"><div class="fill" id="dotsFill"></div></div>
+      <span class="count" id="dotsCount">1 / 3</span>
+    </div>
+</main>
+
+<footer class="tag">Blacktown Special Force · Year 43 (2026)</footer>
+
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- floating hearts background ---------- */
+  var heartField=document.getElementById('heartField');
+  var heartEmojis=['💗','💕','🩷','🩵','💙','🤍'];
+  function spawnHeart(){
+    var h=document.createElement('div');
+    h.className='float-heart';
+    h.textContent=heartEmojis[Math.floor(Math.random()*heartEmojis.length)];
+    h.style.left=(Math.random()*100)+'vw';
+    h.style.setProperty('--drift',(Math.random()*60-30)+'px');
+    h.style.animationDuration=(9+Math.random()*8)+'s';
+    h.style.fontSize=(1+Math.random()*1.3)+'rem';
+    heartField.appendChild(h);
+    setTimeout(function(){ h.remove(); }, 18000);
+  }
+  var heartInterval=setInterval(spawnHeart, 1400);
+  for(var i=0;i<5;i++) setTimeout(spawnHeart, i*300);
+
+  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduceMotion){ clearInterval(heartInterval); heartField.style.display='none'; }
+
+  var soundOn=false; // videos start muted; per-video buttons toggle sound
+
+  /* ---------- carousel (photos dropped in later) ---------- */
+  var slides=Array.prototype.slice.call(document.querySelectorAll('#carousel .slide'));
+  var dotsFill=document.getElementById('dotsFill');
+  var dotsCount=document.getElementById('dotsCount');
+  var curSlide=0, carouselTimer=null;
+  function updateProgress(){
+    if(!dotsFill) return;
+    dotsFill.style.width = ((curSlide+1)/slides.length*100)+'%';
+    dotsCount.textContent = (curSlide+1)+' / '+slides.length;
+  }
+  function pauseAllVideos(){
+    slides.forEach(function(s){
+      var v=s.querySelector('video');
+      if(v){ v.pause(); }
+    });
+  }
+  function setupCaptions(){
+    slides.forEach(function(s){
+      var v=s.querySelector('video');
+      var overlay=s.querySelector('.caption-overlay span');
+      if(!v || !overlay) return;
+      if(v.dataset.captionsWired) return;
+      v.dataset.captionsWired='1';
+      var track=v.querySelector('track');
+      if(!track) return;
+      // drive captions entirely through our own styled overlay (yellow text,
+      // thick black outline) instead of the browser's native ::cue rendering,
+      // so appearance is consistent across desktop and mobile Safari
+      track.addEventListener('load', function(){
+        if(track.track) track.track.mode='hidden';
+      });
+      if(track.track) track.track.mode='hidden';
+      v.textTracks && Array.prototype.forEach.call(v.textTracks, function(tt){
+        tt.mode='hidden';
+        tt.addEventListener('cuechange', function(){
+          var active=tt.activeCues && tt.activeCues.length ? tt.activeCues[0].text : '';
+          overlay.textContent = active || '';
+        });
+      });
+    });
+  }
+  setupCaptions();
+
+  function playActiveVideoIfAny(){
+    var v=slides[curSlide].querySelector('video');
+    if(v){
+      if(!v.src && v.dataset.src){ v.src=v.dataset.src; }
+      // reflect the master Sound toggle immediately, so video audio matches
+      // the overlay's sound state right away instead of waiting for a tap
+      // on the per-video button
+      v.muted = !soundOn;
+      var btn=slides[curSlide].querySelector('.video-mute');
+      if(btn) btn.textContent = v.muted ? '🔇' : '🔊';
+      var attempt=function(){
+        var p=v.play();
+        if(p && p.catch){
+          p.catch(function(){
+            // some browsers reject an audible play() without a direct gesture;
+            // fall back to a muted attempt so the video still plays visually
+            try{
+              v.muted=true;
+              if(btn) btn.textContent='🔇';
+              v.load(); v.play().catch(function(){});
+            }catch(e){}
+          });
+        }
+      };
+      if(v.readyState===0){
+        v.addEventListener('loadedmetadata', attempt, {once:true});
+        v.load();
+      } else {
+        attempt();
+      }
+    }
+  }
+  function goToSlide(i){
+    slides[curSlide].classList.remove('active');
+    pauseAllVideos();
+    curSlide=(i+slides.length)%slides.length;
+    slides[curSlide].classList.add('active');
+    playActiveVideoIfAny();
+    updateProgress();
+  }
+  var carouselVideoWatchdog=null;
+  function startCarouselAuto(){
+    if(!slides || slides.length<2) return;
+    clearInterval(carouselTimer);
+    if(carouselVideoWatchdog){ clearTimeout(carouselVideoWatchdog); carouselVideoWatchdog=null; }
+    // Always advance on a fixed timer so a blocked video can never freeze the show.
+    // Videos still play while their slide is active; we just don't wait on 'ended'.
+    try{ playActiveVideoIfAny(); }catch(e){}
+    carouselTimer=setInterval(function(){
+      try{ goToSlide(curSlide+1); }catch(e){}
+      try{ playActiveVideoIfAny(); }catch(e){}
+    }, 3200);
+  }
+  updateProgress();
+
+  // per-video mute toggle buttons
+  document.querySelectorAll('.video-mute').forEach(function(btn){
+    function toggleMute(e){
+      e.stopPropagation();
+      e.preventDefault();
+      var v=btn.parentElement.querySelector('video');
+      if(!v) return;
+      v.muted=!v.muted;
+      btn.textContent = v.muted ? '🔇' : '🔊';
+    }
+    btn.addEventListener('click', toggleMute);
+    btn.addEventListener('touchend', toggleMute);
+  });
+
+  var carouselEl=document.getElementById('carousel');
+  var touchStartX=null;
+  carouselEl.addEventListener('touchstart', function(e){
+    if(e.target.closest('.video-mute')) return;
+    touchStartX=e.touches[0].clientX; clearInterval(carouselTimer);
+  }, {passive:true});
+  carouselEl.addEventListener('touchend', function(e){
+    if(e.target.closest('.video-mute')) return;
+    if(touchStartX===null) return;
+    var dx=e.changedTouches[0].clientX-touchStartX;
+    if(Math.abs(dx)>40){
+      goToSlide(curSlide + (dx<0?1:-1));
+    } else {
+      // tap (no real swipe): left half of frame = back, right half = forward
+      var rect=carouselEl.getBoundingClientRect();
+      var tapX=e.changedTouches[0].clientX-rect.left;
+      goToSlide(curSlide + (tapX < rect.width/2 ? -1 : 1));
+    }
+    touchStartX=null;
+    startCarouselAuto();
+  }, {passive:true});
+  carouselEl.addEventListener('click', function(e){
+    // desktop click support (touch devices already handled above)
+    if('ontouchstart' in window) return;
+    if(e.target.closest('.video-mute')) return;
+    var rect=carouselEl.getBoundingClientRect();
+    var clickX=e.clientX-rect.left;
+    goToSlide(curSlide + (clickX < rect.width/2 ? -1 : 1));
+    startCarouselAuto();
+  });
+
+  // Show the carousel straight away
+  try{ startCarouselAuto(); }catch(e){}
+
+})();
+</script>
+</body>
+</html>
